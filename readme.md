@@ -1,4 +1,4 @@
-## 🛡 PHP Bot Blocker — Mini-Firewall for Shared Hosting & Simple PHP Projects
+## 🛡 PHP Bot Blocker — Firewall for Shared Hosting & PHP Projects
 
 ---
 
