@@ -60,7 +60,6 @@ Designed for **shared hosting** and **pay-as-you-go cloud platforms** (Railway, 
        Order allow,deny
        Deny from all
    </Files>
-````
 
 3. **Include in your PHP scripts** (e.g., in `index.php`):
 
