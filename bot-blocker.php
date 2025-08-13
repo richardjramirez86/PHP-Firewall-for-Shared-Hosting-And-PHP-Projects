@@ -7,6 +7,117 @@
 
 // add into index.php require_once __DIR__ . '/bot-blocker.php';
 
+/**
+* Bot Blocker + Verified Bot IP Ranges (Google & Yandex)
+*
+* The script performs:
+* - Blocking bad User-Agents and dangerous paths
+* - Limiting requests and bans by IP
+* - Determining real IP behind proxy/CDN
+* - Whitelisting Googlebot and YandexBot by official IP ranges
+*
+* IP cache in bot-blocker-ips.json (updated once a day)
+*/
+
+// ==== Settings ====
+$banDurationDays = 7;
+$rateLimitCount  = 10; // queries
+$rateLimitTime   = 5;  // seconds
+$maxAttempts     = 3;  // attempts for ban
+$ipCacheFile     = __DIR__ . '/bot-blocker-ips.json';
+$ipCacheTTL      = 86400; // 24 hrs
+
+// ==== Determine the real IP ====
+function getClientIP() {
+    $keys = [
+        'HTTP_CF_CONNECTING_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_REAL_IP',
+        'REMOTE_ADDR'
+    ];
+    foreach ($keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            return explode(',', $_SERVER[$key])[0];
+        }
+    }
+    return '0.0.0.0';
+}
+
+$ip = getClientIP();
+
+// ==== IP range download and caching function ====
+function loadBotIPRanges($cacheFile, $ttl) {
+    $now = time();
+    if (file_exists($cacheFile)) {
+        $cache = json_decode(file_get_contents($cacheFile), true);
+        if ($cache && ($now - $cache['time']) < $ttl) {
+            return $cache['ranges'];
+        }
+    }
+
+    $ranges = [];
+
+    // Googlebot (off: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot)
+    $googleIPs = @file_get_contents('https://developers.google.com/static/search/apis/ipranges/googlebot.json');
+    if ($googleIPs) {
+        $json = json_decode($googleIPs, true);
+        if (!empty($json['prefixes'])) {
+            foreach ($json['prefixes'] as $p) {
+                if (isset($p['ipv4Prefix'])) {
+                    $ranges[] = $p['ipv4Prefix'];
+                }
+            }
+        }
+    }
+
+    // Yandex (off: https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.html)
+    $yandexIPs = @file_get_contents('https://yandex.com/support/webmaster/robot-workings/ips.xml');
+    if ($yandexIPs && preg_match_all('/<ip>([^<]+)<\/ip>/', $yandexIPs, $m)) {
+        $ranges = array_merge($ranges, $m[1]);
+    }
+
+    file_put_contents($cacheFile, json_encode(['time' => $now, 'ranges' => $ranges], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    return $ranges;
+}
+
+$botIPRanges = loadBotIPRanges($ipCacheFile, $ipCacheTTL);
+
+// ==== Check if IP belongs to Google/Yandex bots ====
+function ipInRanges($ip, $ranges) {
+    foreach ($ranges as $range) {
+        if (strpos($range, '/') !== false) {
+            if (ipInCidr($ip, $range)) return true;
+        } elseif ($ip === $range) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function ipInCidr($ip, $cidr) {
+    list($subnet, $mask) = explode('/', $cidr);
+    return (ip2long($ip) & ~((1 << (32 - $mask)) - 1)) === ip2long($subnet);
+}
+
+// ==== If it's Googlebot or YandexBot by IP — skip ====
+if (ipInRanges($ip, $botIPRanges)) {
+    return;
+}
+
+// ==== Checking User-Agent ====
+$ua = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
+$badUAs = [
+    'curl', 'wget', 'python', 'sqlmap', 'nmap', 'nikto', 'acunetix', 'netsparker',
+    'dataprovider', 'lighthouse', 'claudebot', 'chatgpt', 'scrapy', 'crawler', 'spider'
+];
+foreach ($badUAs as $bad) {
+    if (strpos($ua, $bad) !== false) {
+        header('HTTP/1.1 403 Forbidden');
+        exit;
+    }
+}
+
+
 $basePath = __DIR__;
 $dbPath = realpath($basePath . '/../') . '/bot-blocker.db';
 
@@ -34,7 +145,7 @@ $badPaths = [
 // 🕷️ Bad User-Agent
 $badAgents = [
     'curl', 'python', 'wget', 'sqlmap', 'nmap',
-    'libwww', 'masscan', 'nikto', 'bot', 'scan',
+    'libwww', 'masscan', 'nikto', 'scan',
     'fuzzer', 'acunetix', 'netsparker', 'jaeles',
     'httpclient', 'dirbuster', 'w3af', 'paros',
     'arachni', 'havij', 'zmeu', 'binlar',
