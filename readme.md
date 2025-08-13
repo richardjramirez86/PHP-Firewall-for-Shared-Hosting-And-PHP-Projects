@@ -89,36 +89,16 @@ Designed for **shared hosting** and **pay-as-you-go cloud platforms** (Railway, 
 
 ---
 
-## 📈 Results You Can Expect
+## 📌 Problem → Solution
 
-After installing:
-
-* 🚀 Faster response times (lower TTFB)
-* 🛡 Drastically reduced bot traffic
-* 📉 Lower hosting bills on usage-based platforms
-* 🔒 Reduced attack surface
-* 🗑 Cleaner logs with only real visitor activity
-
----
-
-## 💻 Tech Stack
-
-![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge\&logo=php\&logoColor=white)
-![SQLite](https://img.shields.io/badge/sqlite-%23003B57.svg?style=for-the-badge\&logo=sqlite\&logoColor=white)
-![Apache](https://img.shields.io/badge/apache-%23D42029.svg?style=for-the-badge\&logo=apache\&logoColor=white)
-![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge\&logo=nginx\&logoColor=white)
-![Shared Hosting](https://img.shields.io/badge/shared_hosting-%23FFA500.svg?style=for-the-badge\&logo=server\&logoColor=white)
-![Firewall](https://img.shields.io/badge/firewall-%23C41E3A.svg?style=for-the-badge\&logo=shield\&logoColor=white)
-![Cache Optimized](https://img.shields.io/badge/cache%20optimized-%23F5A623.svg?style=for-the-badge\&logo=cache\&logoColor=white)
-![Security](https://img.shields.io/badge/security-%234CAF50.svg?style=for-the-badge\&logo=security\&logoColor=white)
-![Proxy Detection](https://img.shields.io/badge/proxy%20detection-%2300BFFF.svg?style=for-the-badge\&logo=network\&logoColor=white)
+| Problem                                                                      | How Bot Blocker Solves It                                                                                                                                                             |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Junk requests from bad User-Agents** (bots, scrapers, scanners)            | Detects and blocks instantly by matching against an extended bad UA list (including Dataprovider, Chrome-Lighthouse, ClaudeBot, ChatGPT, vulnerability scanners, CLI tools).          |
+| **Access to sensitive files** (`wp-login.php`, `.env`, `.sql`, `.git`, etc.) | Blocks requests to known dangerous paths and files, including CMS admin pages, config files, backups, and spam `.txt` files (`ads.txt`, `humans.txt`, `security.txt`, `sitemap.xml`). |
+| **Brute-force & vulnerability scanning**                                     | Tracks repeated suspicious requests from the same IP and bans offenders after a set number of attempts (default: 3).                                                                  |
+| **Flood / rate-based attacks**                                               | Implements rate limiting: more than 10 requests in 5 seconds from one IP → instant ban.                                                                                               |
+| **Temporary bans that reset on restart**                                     | Stores bans in a local SQLite database for 7 days — persistent across server restarts.                                                                                                |
+| **Database overload with request logs**                                      | Automatic cleanup of old request logs every minute to keep storage small and performance high.                                                                                        |
+| **Wrong IP bans behind proxy/CDN**                                           | Detects real visitor IP from Cloudflare and proxy headers (`HTTP_X_FORWARDED_FOR`, `HTTP_CF_CONNECTING_IP`, etc.), not just `REMOTE_ADDR`.                                            |
 
 ---
-
-## 📦 License
-
-MIT — free to use and modify.
-
----
-
-### ⭐ If you find this firewall useful, **star the repository** and share it with the developer community!
