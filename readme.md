@@ -121,8 +121,5 @@ MIT — free to use and modify.
 
 ---
 
-<<<<<<< HEAD
 ### ⭐ If you find this firewall useful, **star the repository** and share it with the developer community!
-=======
-### ⭐ If you find this firewall useful, **star the repository** and share it with the developer community!
->>>>>>> 78d9c7c62ad10c9f32dfbf612887bcadb4fb2818
+
