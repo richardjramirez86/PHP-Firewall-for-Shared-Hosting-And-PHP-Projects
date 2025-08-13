@@ -1,66 +1,67 @@
-## 🛡 PHP Bot Blocker — Firewall for Shared Hosting & PHP Projects
+# 🛡 PHP Bot Blocker — Firewall for Shared Hosting & PHP Projects
 
 ---
 
 ## 📜 Description
 
-Most shared hosting and budget PaaS platforms (Railway, Vercel, Render, etc.) have no built-in protection against spam traffic, scanners, brute-force attempts, and cache-flooding bots.
-This leads to: slower TTFB, overloaded caches, higher hosting bills, and an increased attack surface.
+**PHP Bot Blocker** is a **lightweight, self-contained firewall** for PHP projects that protects against spam traffic, vulnerability scanners, brute-force attacks, and cache-flooding bots — **without root access or complex setup**.  
 
-Bot Blocker instantly filters suspicious requests by User-Agent or path, blocks brute-force and flood attempts, and keeps a persistent ban list in SQLite for 7 days — all without root access or complex setup.
-In real-world use, it cuts response times, reduces hosting costs, and keeps logs almost bot-free.
+Designed for **shared hosting** and **pay-as-you-go cloud platforms** (Railway, Vercel, Render, etc.), it filters malicious requests instantly, blocks suspicious IPs, and keeps a **persistent ban list** in SQLite for 7 days.  
 
-**Problem:**
-This results in:
-
-* **Increased TTFB** — sometimes by +1 second (hurts Google PageSpeed score)
-* **Cache overload** — forcing CDN and app caches to store junk responses
-* **Higher hosting bills** — on pay-per-use tariffs, you pay for “garbage” traffic
-* **Security risks** — open attack surface for automated exploits
+✅ Works on PHP ≥ 5.4  
+✅ No server modules or external APIs required  
+✅ Protects both static and dynamic PHP sites  
 
 ---
 
-### 🛠 How This FireWall Solves the Problem
+## 🚨 The Problem
 
-**Bot Blocker** is a **lightweight, self-contained PHP traffic filter** built for real-world **problem solving** on shared hosting and PaaS platforms:
-
-* Instantly detects and blocks suspicious requests by **User-Agent** or **path (URI)**.
-* Automatically bans an IP after **3 bad requests** or if it exceeds **10 requests in 5 seconds**.
-* Stores the ban list in **SQLite** (local, no MySQL/PostgreSQL) with automatic cleanup after 7 days.
-* Detects real visitor IPs behind proxy/CDN (`HTTP_X_FORWARDED_FOR`, `HTTP_CF_CONNECTING_IP`, etc.).
-* Requires no root access or complex setup — integrates with **one line** in `index.php`.
-* Database and logs are protected — `.db` is stored **above the web root** + `.htaccess` blocking.
-
----
-
-
-## 🛠 Why SQLite
-
-* 📍 **Local** — no network delays
-* ⚡ **Fast** — read/write in ms
-* 🔒 **Safe** — DB stored outside public webroot
-* 🛠 **Zero config** — works on PHP ≥ 5.4 out of the box
-
+| ❌ Problem | 💥 Impact |
+|-----------|----------|
+| Bots and scanners flood your site with junk requests | Higher TTFB, lower PageSpeed score |
+| Sensitive files and CMS admin pages exposed | Risk of exploits and data leaks |
+| CDN and app cache filled with garbage | Wasted bandwidth and storage |
+| High request rates from one IP | Potential DDoS or service slowdown |
+| Pay-as-you-go hosting bills inflated | Paying for “garbage” traffic |
 
 ---
 
-### 🔧 Installation
+## 🛠 How This Firewall Solves It
 
-1. **Place files**:
+| ✅ Feature | 🚀 Benefit |
+|-----------|-----------|
+| Blocks bad User-Agents (scanners, scrapers, AI crawlers) | Cuts junk traffic instantly |
+| Denies access to dangerous paths/files (`wp-login.php`, `.env`, `.sql`, `.git`, etc.) | Prevents common exploit entry points |
+| Auto-bans IPs after 3 bad requests | Stops brute-force attempts |
+| Rate limiting — 10+ requests in 5 sec → ban | Mitigates flood attacks |
+| Persistent bans in SQLite (7 days) | Survives restarts without MySQL |
+| Automatic cleanup of old logs | Keeps DB small & fast |
+| Detects real IP behind Cloudflare/proxies | Avoids false bans |
 
-   * `bot-blocker.php` → in your PHP project root.
-   * `bot-blocker.db` → stored one directory above web root for security.
+---
 
-2. **Protect database**: Add to `.htaccess`:
+## 📌 Why SQLite
 
+| 📍 Local | ⚡ Fast | 🔒 Secure | 🛠 Zero Config |
+|----------|--------|-----------|---------------|
+| No network latency | Read/write in milliseconds | Stored outside public webroot | Works out-of-the-box on PHP ≥ 5.4 |
+
+---
+
+## ⚙️ Installation
+
+1. **Place files**:  
+   - `bot-blocker.php` → project root  
+   - `bot-blocker.db` → **one directory above web root**  
+
+2. **Protect the database** — add to `.htaccess`:  
    ```apache
    <Files "bot-blocker.db">
        Order allow,deny
        Deny from all
    </Files>
-   ```
 
-3. **Include in your scripts** (e.g., at the top of `index.php`):
+3. **Include in your PHP scripts** (e.g., in `index.php`):
 
    ```php
    require_once __DIR__ . '/bot-blocker.php';
@@ -68,37 +69,56 @@ This results in:
 
 ---
 
-### 🚫 What It Blocks
+## 🚫 What It Blocks
 
-#### Bad Paths
+### Bad Paths
 
-* WordPress attack entry points (`wp-login.php`, `xmlrpc.php`, `wp-admin`, etc.)
-* Database & config files (`.env`, `.db`, `.sql`, `.zip`, `.tar`, `.gz`, `.log`, `.bak`, `.git`, `.svn`)
-* Dev/project files (`composer.json`, `package.json`, `node_modules`)
-* Security-related text files (`security.txt`, `.well-known/security.txt`, `ads.txt`, `humans.txt`, `llms.txt`, `list.txt`, `sitemap.xml`)
+* WordPress entry points (`wp-login.php`, `xmlrpc.php`, `wp-admin`)
+* Config/DB files (`.env`, `.sql`, `.db`, `.git`, `.svn`, `.bak`)
+* Dev files (`composer.json`, `package.json`, `node_modules`)
+* Spam `.txt` files (`ads.txt`, `humans.txt`, `security.txt`, `sitemap.xml`)
 
-#### Bad User-Agents
+### Bad User-Agents
 
-* CLI tools (`curl`, `wget`, `python`, `sqlmap`, `nmap`, etc.)
-* Vulnerability scanners (`acunetix`, `nikto`, `netsparker`, etc.)
-* Crawlers/bots (`crawler`, `scrapy`, `search`, `spider`, etc.)
-* Data mining tools (`Dataprovider`, `SimilarWeb`, `DataForSEO`, etc.)
-* Performance auditing tools (`Chrome-Lighthouse`, `GTmetrix`, `WebPageTest`, etc.)
-* AI crawlers/assistants (`ClaudeBot`, `ChatGPT-User`, `PerplexityBot`, etc.)
+* CLI tools (`curl`, `wget`, `python`, `sqlmap`, `nmap`)
+* Vulnerability scanners (`acunetix`, `nikto`, `netsparker`)
+* Crawlers/bots (`crawler`, `scrapy`, `search`, `spider`)
+* Data miners (`Dataprovider`, `SimilarWeb`, `DataForSEO`)
+* Performance tools (`Chrome-Lighthouse`, `GTmetrix`, `WebPageTest`)
+* AI crawlers (`ClaudeBot`, `ChatGPT-User`, `PerplexityBot`)
 
+---
+
+## 📈 Results You Can Expect
+
+After installing:
+
+* 🚀 Faster response times (lower TTFB)
+* 🛡 Drastically reduced bot traffic
+* 📉 Lower hosting bills on usage-based platforms
+* 🔒 Reduced attack surface
+* 🗑 Cleaner logs with only real visitor activity
 
 ---
 
-## 📌 Problem → Solution
+## 💻 Tech Stack
 
-| Problem                                                                      | How Bot Blocker Solves It                                                                                                                                                             |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Junk requests from bad User-Agents** (bots, scrapers, scanners)            | Detects and blocks instantly by matching against an extended bad UA list (including Dataprovider, Chrome-Lighthouse, ClaudeBot, ChatGPT, vulnerability scanners, CLI tools).          |
-| **Access to sensitive files** (`wp-login.php`, `.env`, `.sql`, `.git`, etc.) | Blocks requests to known dangerous paths and files, including CMS admin pages, config files, backups, and spam `.txt` files (`ads.txt`, `humans.txt`, `security.txt`, `sitemap.xml`). |
-| **Brute-force & vulnerability scanning**                                     | Tracks repeated suspicious requests from the same IP and bans offenders after a set number of attempts (default: 3).                                                                  |
-| **Flood / rate-based attacks**                                               | Implements rate limiting: more than 10 requests in 5 seconds from one IP → instant ban.                                                                                               |
-| **Temporary bans that reset on restart**                                     | Stores bans in a local SQLite database for 7 days — persistent across server restarts.                                                                                                |
-| **Database overload with request logs**                                      | Automatic cleanup of old request logs every minute to keep storage small and performance high.                                                                                        |
-| **Wrong IP bans behind proxy/CDN**                                           | Detects real visitor IP from Cloudflare and proxy headers (`HTTP_X_FORWARDED_FOR`, `HTTP_CF_CONNECTING_IP`, etc.), not just `REMOTE_ADDR`.                                            |
+![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge\&logo=php\&logoColor=white)
+![SQLite](https://img.shields.io/badge/sqlite-%23003B57.svg?style=for-the-badge\&logo=sqlite\&logoColor=white)
+![Apache](https://img.shields.io/badge/apache-%23D42029.svg?style=for-the-badge\&logo=apache\&logoColor=white)
+![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge\&logo=nginx\&logoColor=white)
+![Shared Hosting](https://img.shields.io/badge/shared_hosting-%23FFA500.svg?style=for-the-badge\&logo=server\&logoColor=white)
+![Firewall](https://img.shields.io/badge/firewall-%23C41E3A.svg?style=for-the-badge\&logo=shield\&logoColor=white)
+![Cache Optimized](https://img.shields.io/badge/cache%20optimized-%23F5A623.svg?style=for-the-badge\&logo=cache\&logoColor=white)
+![Security](https://img.shields.io/badge/security-%234CAF50.svg?style=for-the-badge\&logo=security\&logoColor=white)
+![Proxy Detection](https://img.shields.io/badge/proxy%20detection-%2300BFFF.svg?style=for-the-badge\&logo=network\&logoColor=white)
 
 ---
+
+## 📦 License
+
+MIT — free to use and modify.
+
+---
+
+### ⭐ If you find this firewall useful, **star the repository** and share it with the developer community!
