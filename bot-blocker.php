@@ -137,9 +137,7 @@ $badPaths = [
     'readme.md', 'readme.txt', 'license', 'changelog',
     'backup', 'adminer.php', 'shell.php', 'cmd.php',
     'info.php', 'test.php', 'phpinfo', 'pma/', 'mysql/',
-    'dump.sql', 'database.sql',
-    'security.txt', '.well-known/security.txt',
-    'ads.txt', 'humans.txt', 'llms.txt', 'list.txt', 'sitemap.xml'
+    'dump.sql', 'database.sql','humans.txt', 'llms.txt', 'list.txt'
 ];
 
 // 🕷️ Bad User-Agent
